@@ -1,3 +1,5 @@
+/**************   SPICY : add archive functionality   *************/
+
 let googleUserId;
 
 window.onload = (event) => {
@@ -31,10 +33,10 @@ const renderData = (data) => {
     for (let key in data) {
         if(data[key].archived != null && data[key].archived == true) {
             console.log(data[key].archived);
-        } else {
-            console.log(data[key].archived);
             titleArr.push(data[key].title);
             keyArr.push([data[key].title, key]);
+        } else {
+            console.log(data[key].archived);
         }  
     }
     titleArr.sort();
@@ -63,11 +65,8 @@ const createCard = (note, noteId) => {
                         <a href="#" class="card-footer-item" onclick="deleteNote('${noteId}')">
                             Delete
                         </a>
-                        <a href="#" class="card-footer-item" onclick="editNote('${noteId}')">
-                            Edit
-                        </a>
-                        <a href="#" class="card-footer-item" onclick="archiveNote('${noteId}')">
-                            Archive
+                        <a href="#" class="card-footer-item" onclick="unarchiveNote('${noteId}')">
+                            Unarchive
                         </a>
                     </footer>
                 </div>
@@ -82,53 +81,15 @@ const deleteNote = (noteId) => {
     }
 }
 
-const editNote = (noteId) => {
-    const editTitle = document.querySelector("#editTitle");
-    const editText = document.querySelector("#editText");
-    const editNoteModal = document.querySelector("#editNoteModal");
-    const noteToEditRef = firebase.database().ref(`users/${googleUserId}/${noteId}`);
-    const editNoteIdInput = document.querySelector("#editNoteId");
-
-    noteToEditRef.once('value', (snapshot) => {
-        const note = snapshot.val();
-        editTitle.value = note.title;
-        editText.value = note.text;
-        editNoteIdInput.value = noteId;
-        
-        editNoteModal.classList.add("is-active");
-    });
-}
-
-const archiveNote = (noteId) => {
+const unarchiveNote = (noteId) => {
     const noteToArchiveRef = firebase.database().ref(`users/${googleUserId}/${noteId}`);
-    const dbRef = firebase.database().ref(`users/${googleUserId}`);
-    
+
     noteToArchiveRef.update({
-        archived: true
-    });
+        archived: false
+    })
 }
 
 const closeModal = () => {
     const editNoteModal = document.querySelector("#editNoteModal");
     editNoteModal.classList.remove("is-active");
-}
-
-const saveChanges = () => {
-    const editTitle = document.querySelector("#editTitle");
-    const editText = document.querySelector("#editText");
-    const editNoteModal = document.querySelector("#editNoteModal");
-    const editNoteIdInput = document.querySelector("#editNoteId");
-
-    const saveTitle = editTitle.value;
-    const saveText = editText.value;
-    const saveId = editNoteIdInput.value;
-    
-    const noteToEditRef = firebase.database().ref(`users/${googleUserId}/${saveId}`);    
-    
-    noteToEditRef.update({
-        title: saveTitle,
-        text: saveText
-    })
-
-    closeModal();
 }
